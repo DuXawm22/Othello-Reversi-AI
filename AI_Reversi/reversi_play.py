@@ -2,11 +2,13 @@
 
 import random
 import AI
+import AI2
 
-generation = 2500 ## Genreation to play against
+generation = random.randint(2500, 2506) ## Genreation to play against
+generation2 = random.randint(3500,3506)
 n = 8 # board size 8,6,4,2(needs to be even)
-white = "☺" # white tile ascii
-black = "☻" # black tile ascii
+black = "☺" # white tile ascii
+white = "☻" # black tile ascii
 bg = "•" # bg tile ascii
 
 w = -1 # white tile ID
@@ -16,7 +18,7 @@ board = [[0 for _ in range(n)] for _ in range(n)] # the board
 
 
 def playerASCII(): # defining tile ID
-    return white if turn == w else black
+    return black if turn == w else white
 
 def countChess(turn): # count how many pieces are on the board
     return sum(board[i].count(turn) for i in range(n))
@@ -106,10 +108,11 @@ whiteCanPlay = True # if white is not stuck
 blackCanPlay = True # if black is not stuck
 
 # legal check
-playerTile = input("Choose your chess color.  Type 'b' for black and white otherwise.  Black goes first: ")
-playerTile = b if playerTile == 'b' else w
+playerTile = input("Choose your side. Type 'b' for black and white otherwise. Black goes first: ")
+playerTile = 'b' if playerTile == 'b' else w
 
 bestNetwork = AI.loadNetworks(AI.structure, generation)[0]
+bestNetwork2 = AI2.loadNetworks(AI2.structure, generation2)[0]
 
 
 while whiteCanPlay or blackCanPlay:
@@ -136,8 +139,9 @@ while whiteCanPlay or blackCanPlay:
             # player's turn, legal check
             while True:
                 try:
-                    x, y = input(playerASCII() + \
-                                 ", it's your move (x y): ").split()
+                    # computer's turn
+                    #x, y = random.choice(validMoves)\
+                    x, y = AI2.chooseMove(board, AI2.structure, bestNetwork2, turn)
                     x, y = int(x), int(y)
                     if isLegal(x, y, turn):
                         break
@@ -164,8 +168,15 @@ while whiteCanPlay or blackCanPlay:
 
 # printing who wins
 print()
-print("Game Over!")
 printBoard()
-print(black + " Wins!" if countChess(b) > countChess(w) else \
-      (white + " Wins!" if countChess(b) < countChess(w) else \
+print(black + " Black Wins!" if countChess(b) > countChess(w) else \
+      (white + " White Wins!" if countChess(b) < countChess(w) else \
+       "It's a tie!"))
+if playerTile != 'b':
+    print("You Lose!" if countChess(b) > countChess(w) else\
+        ("You Win!" if countChess(b) < countChess(w) else \
+       "It's a tie!"))
+else:
+    print("You Win!" if countChess(b) > countChess(w) else\
+        ("You Lose!" if countChess(b) < countChess(w) else \
        "It's a tie!"))
